@@ -4,7 +4,9 @@ import { ResponsiveBar } from '@nivo/bar'
 import { ContextConfig } from '../context/ContextConfig'
 import { motion } from 'framer-motion'
 
-const Estadisticas = () => {
+const Estadisticas = (props) => {
+
+    const { pagina } = props
 
     const [aula1, setAula1] = useState([])
     const [aula2, setAula2] = useState([])

@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { LuMenu } from "react-icons/lu";
 import { ContextConfig } from "../context/ContextConfig";
 import html2canvas from 'html2canvas';
@@ -6,7 +6,9 @@ import jsPDF from 'jspdf';
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
-const Aside = () => {
+const Aside = (props) => {
+
+    const { pagina } = props
 
     const [isOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -15,6 +17,35 @@ const Aside = () => {
     const { handleCheckboxChangeClassroom, handleCheckboxChangeDate, handleCheckboxChangeGrupo, ipserver, cargaExitosa } = useContext(ContextConfig)
 
     const navigate = useNavigate()
+
+    const [fechas, setFechas] = useState([])
+    const [aulas, setAulas] = useState([])
+    const [grupos, setGrupos] = useState([])
+
+    const handleFiltros = () => {
+        if (pagina === 'policia') {
+            setFechas(['2024-07-02', '2024-07-03', '2024-07-04'])
+            setAulas(['Aula 01', 'Aula 02', 'Aula 03', 'Aula 04', 'Aula 05', 'Aula 06'])
+            setGrupos(['GRUPO 01', 'GRUPO 02', 'GRUPO 03', 'GRUPO 04'])
+        } else if (pagina === 'penitenciario') {
+            setAulas(['Aula 01', 'Aula 02', 'Aula 03', 'Aula 04'])
+            setGrupos(['GRUPO 01', 'GRUPO 02', 'GRUPO 03', 'GRUPO 04'])
+            setFechas(['2024-07-10', '2024-07-11'])
+        }
+    }
+
+    const fechasPair = [];
+    for(let i = 0; i < fechas.length; i += 2) {
+        fechasPair.push(fechas.slice(i, i + 2));
+    }
+    const aulasPair = [];
+    for(let i = 0; i < aulas.length; i += 2) {
+        aulasPair.push(aulas.slice(i, i + 2));
+    }
+    const gruposPair = [];
+    for(let i = 0; i < grupos.length; i += 2) {
+        gruposPair.push(grupos.slice(i, i + 2));
+    }
 
     const handleOpen = () => {
         setIsOpen(!isOpen)
@@ -90,7 +121,8 @@ const Aside = () => {
 
         if (password) {
             if (password === 'minsegtuc911') {
-                navigate('/controldegestion/examenes/carga')
+                //navigate('/controldegestion/examenes/carga')
+                navigate('/examenes/resultados/carga')
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -100,6 +132,10 @@ const Aside = () => {
             }
         }
     }
+
+    useEffect(() => {
+        handleFiltros()
+    }, [])
 
     useEffect(() => {
         fetch(`http://${ipserver}/ultimacarga`, {
@@ -131,10 +167,11 @@ const Aside = () => {
     }, [cargaExitosa])
 
     return (
-        <div className={`bg-[#345071] w-full flex flex-col px-4 md:w-1/6 md:h-screen md:items-start md:justify-start ${isOpen ? 'h-altura items-start' : 'h-16'}`}>
+        <div className={`bg-[#345071] w-full flex flex-col px-4 md:w-1/6 md:h-screen md:items-start md:justify-start ${isOpen ? 'items-start' : 'h-16'}`}>
             <div className="flex flex-row items-center w-full justify-between h-16 md:items-start">
-                <Link to={'/controldegestion/examenes/'}>
-                    <img src="/controldegestion/examenes/logo_blanco_min.png" className="w-1/2 md:w-full md:mt-4" alt="" />
+                <Link to={'/examenes/'}>
+                    <img src="/examenes/logo_blanco_min.png" className="w-1/2 md:w-full md:mt-4" alt="" />
+                    {/* <img src="/controldegestion/examenes/logo_blanco_min.png" className="w-1/2 md:w-full md:mt-4" alt="" /> */}
                     {/* <img src="/logo_blanco_min.png" className="w-1/2 md:w-full md:mt-4" alt="" /> */}
                 </Link>
                 <LuMenu className={`text-white text-2xl md:hidden`} onClick={handleOpen} />
@@ -143,86 +180,64 @@ const Aside = () => {
                 {/* <h1 className='text-white font-bold md:text-md'>FILTROS</h1> */}
                 <p className='text-white font-semibold'>Fechas:</p>
                 <div className='flex flex-col mb-3 w-full items-center gap-2 md:gap-1'>
-                    <div className='flex w-full gap-2 justify-start md:flex-col md:items-start md:gap-1'>
-                        <div className="flex items-center gap-2">
-                            <input type="checkbox" value="2024-07-02" onChange={handleCheckboxChangeDate} />
-                            <label htmlFor="" className='text-white'>02/07/2024</label>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <input type="checkbox" value="2024-07-03" onChange={handleCheckboxChangeDate} />
-                            <label htmlFor="" className='text-white'>03/07/2024</label>
-                        </div>
-                    </div>
-                    <div className='flex w-full gap-2 justify-start md:flex-col md:items-start md:gap-1'>
-                        <div className="flex items-center gap-2">
-                            <input type="checkbox" value="2024-07-04" onChange={handleCheckboxChangeDate} />
-                            <label htmlFor="" className='text-white'>04/07/2024</label>
-                        </div>
-                    </div>
+                    {
+                        fechasPair.map((pair, index) => (
+                            <div key={index} className='flex w-full gap-2 justify-start md:flex-col md:items-start md:gap-1'>
+                                {
+                                    pair.map((fecha, index) => (
+                                        <div key={index} className="flex items-center gap-2">
+                                            <input type="checkbox" value={fecha} onChange={handleCheckboxChangeDate} />
+                                            <label htmlFor="" className='text-white'>{fecha.split('-').reverse().join('/')}</label>
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        ))
+                    }
                 </div>
                 <p className='text-white mt-2 font-semibold'>Turnos:</p>
                 <div className='flex flex-col mb-3 w-full items-center gap-2 md:gap-1'>
-                    <div className='flex w-full gap-2 justify-start md:flex-col md:items-start md:gap-1'>
-                        <div className="flex items-center gap-2">
-                            <input type="checkbox" value="GRUPO 01" onChange={handleCheckboxChangeGrupo} />
-                            <label htmlFor="" className='text-white'>Grupo 01</label>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <input type="checkbox" value="GRUPO 02" onChange={handleCheckboxChangeGrupo} />
-                            <label htmlFor="" className='text-white'>Grupo 02</label>
-                        </div>
-                    </div>
-                    <div className='flex w-full gap-2 justify-start md:flex-col md:items-start md:gap-1'>
-                        <div className="flex items-center gap-2">
-                            <input type="checkbox" value="GRUPO 03" onChange={handleCheckboxChangeGrupo} />
-                            <label htmlFor="" className='text-white'>Grupo 03</label>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <input type="checkbox" value="GRUPO 04" onChange={handleCheckboxChangeGrupo} />
-                            <label htmlFor="" className='text-white'>Grupo 04</label>
-                        </div>
-                    </div>
+                    {
+                        gruposPair.map((pair, index) => (
+                            <div key={index} className='flex w-full gap-2 justify-start md:flex-col md:items-start md:gap-1'>
+                                {
+                                    pair.map((grupo, index) => (
+                                        <div key={index} className="flex items-center gap-2">
+                                            <input type="checkbox" value={grupo} onChange={handleCheckboxChangeGrupo} />
+                                            <label htmlFor="" className='text-white'>{grupo}</label>
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        ))
+                    }
                 </div>
                 <p className='text-white font-semibold'>Aulas:</p>
                 <div className='flex flex-col mb-3 w-full items-center gap-2 md:gap-1'>
-                    <div className='flex w-full gap-2 justify-start md:flex-col md:items-start md:gap-1'>
-                        <div className="flex items-center gap-2">
-                            <input type="checkbox" value="Aula 01" onChange={handleCheckboxChangeClassroom} />
-                            <label htmlFor="" className='text-white'>Aula 1</label>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <input type="checkbox" value="Aula 02" onChange={handleCheckboxChangeClassroom} />
-                            <label htmlFor="" className='text-white'>Aula 2</label>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <input type="checkbox" value="Aula 03" onChange={handleCheckboxChangeClassroom} />
-                            <label htmlFor="" className='text-white'>Aula 3</label>
-                        </div>
-                    </div>
-                    <div className='flex w-full gap-2 justify-start md:flex-col md:items-start md:gap-1'>
-                        <div className="flex items-center gap-2">
-                            <input type="checkbox" value="Aula 04" onChange={handleCheckboxChangeClassroom} />
-                            <label htmlFor="" className='text-white'>Aula 4</label>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <input type="checkbox" value="Aula 05" onChange={handleCheckboxChangeClassroom} />
-                            <label htmlFor="" className='text-white'>Aula 5</label>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <input type="checkbox" value="Aula 06" onChange={handleCheckboxChangeClassroom} />
-                            <label htmlFor="" className='text-white'>Aula 6</label>
-                        </div>
-                    </div>
+                    {
+                        aulasPair.map((pair, index) => (
+                            <div key={index} className='flex w-full gap-2 justify-start md:flex-col md:items-start md:gap-1'>
+                                {
+                                    pair.map((aula, index) => (
+                                        <div key={index} className="flex items-center gap-2">
+                                            <input type="checkbox" value={aula} onChange={handleCheckboxChangeClassroom} />
+                                            <label htmlFor="" className='text-white'>{aula}</label>
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        ))
+                    }
                 </div>
                 <button
-                    className='bg-black text-white rounded-lg h-6 uppercase font-semibold mr-2 md:mr-2 md:mb-2 min-w-28 text-sm'
+                    className={`bg-black text-white rounded-lg h-6 uppercase font-semibold mr-2 md:mr-2 md:mb-2 min-w-28 text-sm ${pagina === 'penitenciario' ? 'md:mt-24' : 'md:mt-0'}`}
                     onClick={handleExportPDF}
                     disabled={loading}
                 >
                     {loading ? 'Generando PDF...' : 'EXPORTAR'}
                 </button>
 
-                <button className='bg-black text-white rounded-lg h-6 uppercase font-semibold min-w-28 text-sm'
+                <button className={`bg-black text-white rounded-lg h-6 uppercase font-semibold min-w-28 text-sm`}
                     onClick={handleButtonCarga}>CARGAR
                 </button>
                 {

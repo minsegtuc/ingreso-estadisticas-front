@@ -1,21 +1,18 @@
 import React from 'react'
-import Aside from './components/Aside'
-import Estadisticas from './components/Estadisticas'
+import Inicio from './components/Inicio'
 import './index.css'
 import { ContextProvider } from './context/ContextConfig';
-import { Router, Route, Routes } from 'react-router-dom';
-import Carga from './components/Carga';
+import { Route, Routes } from 'react-router-dom';
+import Home from './pages/Home';
 
 const App = () => {
   return (
-    <div className='flex flex-col md:flex-row'>
+    <div className=''>
       <ContextProvider>
-        <Aside />
         <Routes>
-          {/* <Route path='/' element={<Estadisticas />} />
-          <Route path='/carga' element={<Carga />} /> */}
-          <Route path='/controldegestion/examenes/' element={<Estadisticas />} />
-          <Route path='/controldegestion/examenes/carga' element={<Carga />} />
+          <Route path='/examenes/' element={<Inicio />} />
+          <Route path='/examenes/resultados/' element={<Home />} />
+          <Route path='/examenes/resultados/carga' element={<Home />} />
         </Routes>
       </ContextProvider>
     </div>

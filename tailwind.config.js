@@ -11,7 +11,6 @@ export default {
       },
       height:{
         's': '432px',
-        'altura': '396px'
       }
     },
   },
