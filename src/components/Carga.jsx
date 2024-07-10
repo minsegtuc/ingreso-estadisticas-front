@@ -5,6 +5,8 @@ import Papa, { parse } from 'papaparse'
 
 const Carga = () => {
 
+    const pageName = localStorage.getItem('pageName') === 'policia' ? 'POL' : 'PEN'
+
     const { ipserver, handleCargaExitosa, cargaExitosa } = useContext(ContextConfig)
 
     const [registroCargado, setRegistroCargado] = useState([]);
@@ -85,7 +87,7 @@ const Carga = () => {
                         }
                     });
 
-                    fetch(`http://${ipserver}/examenes/${results.data[2][1]}`, {
+                    fetch(`https://${ipserver}/examenes/${results.data[2][1]}`, {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json'
@@ -133,7 +135,7 @@ const Carga = () => {
 
     const handleCarga = () => {
         handleCargaExitosa(false);
-        fetch(`http://${ipserver}/actualizar`, {
+        fetch(`https://${ipserver}/actualizar`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -153,7 +155,7 @@ const Carga = () => {
     }
 
     useEffect(() => {
-        fetch(`http://${ipserver}/examenes`, {
+        fetch(`https://${ipserver}/examenes`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -167,17 +169,21 @@ const Carga = () => {
 
     return (
         <div className='flex flex-col items-center w-full h-full md:w-5/6 md:h-screen md:items-center md:justify-start '>
-            <div className='w-full flex flex-col items-center justify-center'>
+            <div className='w-full flex flex-col items-center justify-center md:h-1/4'>
                 <h1 className='text-bold font-bold uppercase py-4'>cargar archivos</h1>
                 <input type="file" name="" id="" accept='.csv' onChange={handleFileUpload} />
                 <button className='px-8 py-1 bg-black text-white rounded-xl mt-4' onClick={handleCarga}>CARGAR</button>
             </div>
-            <div className='w-full flex flex-col justify-start p-8'>
-                <ul>
+            <div className='w-full flex p-8 md:h-3/4 overflow-auto mb-2'>
+                <ul className='flex flex-wrap justify-center h-full'>
                     {registroCargado.map((registro, index) => {
-                        if (registro.cantidadAprobados !== null && registro.cantidadDesaprobados !== null && registro.cantidadAusentes !== null) {
+                        if (registro.cantidadAprobados !== null && registro.cantidadDesaprobados !== null && registro.cantidadAusentes !== null && registro.fuerza === pageName) {
                             return (
-                                <li className='font-semibold text-sm' key={index}>{registro.idexamen} fue cargado</li>
+                                <li className='font-semibold text-sm bg-green-300 px-2 py-4 m-3 rounded-md w-32 text-center' key={index}>{registro.idexamen}</li>
+                            )
+                        }else if(registro.fuerza === pageName){
+                            return (
+                                <li className='font-semibold text-sm bg-red-300 px-2 py-4 m-3 rounded-md w-32 text-center' key={index}>{registro.idexamen}</li>
                             )
                         }
                     })}

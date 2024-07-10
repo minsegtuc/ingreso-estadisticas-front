@@ -3,16 +3,19 @@ import { LuMenu } from "react-icons/lu";
 import { ContextConfig } from "../context/ContextConfig";
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 
-const Aside = (props) => {
+const Aside = () => {
 
-    const { pagina } = props
+    //const path = useLocation().pathname.includes('carga') ? 'carga' : '';
+    //console.log(path)
 
     const [isOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const [fechaDescarga, setFechaDescarga] = useState('')
+
+    const pageName = localStorage.getItem('pageName');
 
     const { handleCheckboxChangeClassroom, handleCheckboxChangeDate, handleCheckboxChangeGrupo, ipserver, cargaExitosa } = useContext(ContextConfig)
 
@@ -23,11 +26,11 @@ const Aside = (props) => {
     const [grupos, setGrupos] = useState([])
 
     const handleFiltros = () => {
-        if (pagina === 'policia') {
+        if (pageName === 'policia') {
             setFechas(['2024-07-02', '2024-07-03', '2024-07-04'])
             setAulas(['Aula 01', 'Aula 02', 'Aula 03', 'Aula 04', 'Aula 05', 'Aula 06'])
             setGrupos(['GRUPO 01', 'GRUPO 02', 'GRUPO 03', 'GRUPO 04'])
-        } else if (pagina === 'penitenciario') {
+        } else if (pageName === 'penitenciario') {
             setAulas(['Aula 01', 'Aula 02', 'Aula 03', 'Aula 04'])
             setGrupos(['GRUPO 01', 'GRUPO 02', 'GRUPO 03', 'GRUPO 04'])
             setFechas(['2024-07-10', '2024-07-11'])
@@ -121,7 +124,6 @@ const Aside = (props) => {
 
         if (password) {
             if (password === 'minsegtuc911') {
-                //navigate('/controldegestion/examenes/carga')
                 navigate('/examenes/resultados/carga')
             } else {
                 Swal.fire({
@@ -138,7 +140,7 @@ const Aside = (props) => {
     }, [])
 
     useEffect(() => {
-        fetch(`http://${ipserver}/ultimacarga`, {
+        fetch(`https://${ipserver}/ultimacarga`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -230,7 +232,7 @@ const Aside = (props) => {
                     }
                 </div>
                 <button
-                    className={`bg-black text-white rounded-lg h-6 uppercase font-semibold mr-2 md:mr-2 md:mb-2 min-w-28 text-sm ${pagina === 'penitenciario' ? 'md:mt-24' : 'md:mt-0'}`}
+                    className={`bg-black text-white rounded-lg h-6 uppercase font-semibold mr-2 md:mr-2 md:mb-2 min-w-28 text-sm ${pageName === 'penitenciario' ? 'md:mt-24' : 'md:mt-0'}`}
                     onClick={handleExportPDF}
                     disabled={loading}
                 >

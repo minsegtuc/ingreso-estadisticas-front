@@ -8,9 +8,9 @@ export const ContextProvider = ({ children }) => {
     const [classrooms, setClassrooms] = useState([])
     const [grupos, setGrupos] = useState([])
     const [cargaExitosa, setCargaExitosa] = useState(false);
-    const [pageName, setPageName] = useState('')
+    //const [pageName, setPageName] = useState('')
 
-    const ipserver = '195.200.4.76:3001'
+    const ipserver = 'srv555183.hstgr.cloud:3001'
     //const ipserver = 'ingreso-one.vercel.app'
     //const ipserver = 'localhost:3000'
 
@@ -18,8 +18,8 @@ export const ContextProvider = ({ children }) => {
         setCargaExitosa(estado);
     }
 
-    const handlePage = (page) => {
-        setPageName(page)
+    const handlePageName = (page) => {
+        localStorage.setItem('pageName', page)
     }
 
     const handleCheckboxChangeGrupo = (e) => {
@@ -53,7 +53,7 @@ export const ContextProvider = ({ children }) => {
     }
 
     return(
-        <ContextConfig.Provider value={{handleCheckboxChangeClassroom, handleCheckboxChangeDate, dates, classrooms, grupos, ipserver, handleCargaExitosa, cargaExitosa, handleCheckboxChangeGrupo, pageName, handlePage}}>
+        <ContextConfig.Provider value={{handleCheckboxChangeClassroom, handleCheckboxChangeDate, dates, classrooms, grupos, ipserver, handleCargaExitosa, cargaExitosa, handleCheckboxChangeGrupo, handlePageName}}>
             {children}
         </ContextConfig.Provider>
     )

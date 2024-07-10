@@ -4,9 +4,7 @@ import { ResponsiveBar } from '@nivo/bar'
 import { ContextConfig } from '../context/ContextConfig'
 import { motion } from 'framer-motion'
 
-const Estadisticas = (props) => {
-
-    const { pagina } = props
+const Estadisticas = () => {
 
     const [aula1, setAula1] = useState([])
     const [aula2, setAula2] = useState([])
@@ -14,6 +12,9 @@ const Estadisticas = (props) => {
     const [aula4, setAula4] = useState([])
     const [aula5, setAula5] = useState([])
     const [aula6, setAula6] = useState([])
+    const [loading, setLoading] = useState(true)
+
+    const pageName = localStorage.getItem('pageName')
 
     const { dates, classrooms, ipserver, grupos } = useContext(ContextConfig)
     const [aprobadosTotal, setAprobadosTotal] = useState(0)
@@ -575,10 +576,12 @@ const Estadisticas = (props) => {
         setData2(data2Aux)
         setData3(data3Aux)
         setData4(data4Aux)
+
+        setLoading(false)
     }
 
     useEffect(() => {
-        fetch(`http://${ipserver}/fechayaula`, {
+        fetch(`https://${ipserver}/fechayaula/${pageName}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -597,6 +600,7 @@ const Estadisticas = (props) => {
                     setData4([])
                     setAprobadosTotal(0)
                     setDesaprobadosTotal(0)
+                    setLoading(false)
                 } else {
                     const aula1Aux = data.filter(d => d.aula === 'AULA 01')
                     const aula2Aux = data.filter(d => d.aula === 'AULA 02')
@@ -626,7 +630,6 @@ const Estadisticas = (props) => {
 
     return (
         <div className='flex flex-col items-center w-full h-full md:w-5/6 md:h-screen md:items-start md:justify-start md:overflow-hidden' id='componente-exportar'>
-            {/* GRAFICAS */}
             <div className='flex flex-col items-center w-full h-auto md:flex-col md:items-start md:h-4/6'>
                 <div className='text-center pt-2 h-6 w-full md:h-12'>
                     <h1 className='w-full font-semibold text-2xl md:h-full'>INGRESO 2024</h1>
@@ -635,99 +638,237 @@ const Estadisticas = (props) => {
                     <div className='flex flex-col items-center py-4 h-80 w-full md:w-1/2'>
                         {/* <h2 className='font-semibold uppercase text-2xl'>Porcentajes</h2> */}
                         {
-                            data1.length === 0 ? <motion.p
-                                className={`uppercase m-auto`}
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.5 }}
-                            >
-                                No hay datos para mostrar
-                            </motion.p> : <ResponsivePie
-                                data={data1}
-                                margin={{ top: 50, right: 60, bottom: 55, left: 60 }}
-                                innerRadius={0.6}
-                                padAngle={0}
-                                cornerRadius={0}
-                                activeOuterRadiusOffset={6}
-                                borderWidth={3}
-                                valueFormat={e => `${e}%`}
-                                borderColor={{
-                                    from: 'color',
-                                    modifiers: [
-                                        [
-                                            'darker',
-                                            0
+                            loading ? (<svg class="animate-spin h-10 w-10 m-auto" viewBox="0 0 24 24"><circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                                fill="none"
+                            ></circle>
+                                <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M12 2a10 10 0 00-10 10h4a6 6 0 016-6V2z"
+                                ></path>
+                            </svg>) :
+                                data1.length === 0 ? <motion.p
+                                    className={`uppercase m-auto`}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.5 }}
+                                >
+                                    No hay datos para mostrar
+                                </motion.p> : <ResponsivePie
+                                    data={data1}
+                                    margin={{ top: 50, right: 60, bottom: 55, left: 60 }}
+                                    innerRadius={0.6}
+                                    padAngle={0}
+                                    cornerRadius={0}
+                                    activeOuterRadiusOffset={6}
+                                    borderWidth={3}
+                                    valueFormat={e => `${e}%`}
+                                    borderColor={{
+                                        from: 'color',
+                                        modifiers: [
+                                            [
+                                                'darker',
+                                                0
+                                            ]
                                         ]
-                                    ]
-                                }}
-                                enableArcLinkLabels={false}
-                                arcLinkLabelsSkipAngle={10}
-                                arcLinkLabelsTextColor="#333333"
-                                arcLinkLabelsThickness={2}
-                                arcLinkLabelsColor={{ from: 'color' }}
-                                arcLabelsSkipAngle={10}
-                                arcLabelsTextColor="#fff"
-                                theme={{
-                                    labels: {
-                                        text: {
-                                            fontSize: 12,
-                                            fontWeight: 'bold',
-                                        }
-                                    }
-                                }}
-                                legends={[
-                                    {
-                                        anchor: 'top',
-                                        direction: 'row',
-                                        justify: false,
-                                        translateX: 20,
-                                        translateY: -35,
-                                        itemsSpacing: 2,
-                                        itemWidth: 100,
-                                        itemHeight: 20,
-                                        itemTextColor: '#000',
-                                        itemDirection: 'left-to-right',
-                                        itemOpacity: 1,
-                                        symbolSize: 18,
-                                        symbolShape: 'circle',
-                                        effects: [
-                                            {
-                                                on: 'hover',
-                                                style: {
-                                                    itemTextColor: '#000'
-                                                }
+                                    }}
+                                    enableArcLinkLabels={false}
+                                    arcLinkLabelsSkipAngle={10}
+                                    arcLinkLabelsTextColor="#333333"
+                                    arcLinkLabelsThickness={2}
+                                    arcLinkLabelsColor={{ from: 'color' }}
+                                    arcLabelsSkipAngle={10}
+                                    arcLabelsTextColor="#fff"
+                                    theme={{
+                                        labels: {
+                                            text: {
+                                                fontSize: 12,
+                                                fontWeight: 'bold',
                                             }
-                                        ],
-                                        textStyle: {
-                                            fontSize: '32px',
-                                            fontWeight: 'bold'
                                         }
-                                    }
-                                ]}
-                                colors={({ data }) => data.color}
-                            />
+                                    }}
+                                    legends={[
+                                        {
+                                            anchor: 'top',
+                                            direction: 'row',
+                                            justify: false,
+                                            translateX: 20,
+                                            translateY: -35,
+                                            itemsSpacing: 2,
+                                            itemWidth: 100,
+                                            itemHeight: 20,
+                                            itemTextColor: '#000',
+                                            itemDirection: 'left-to-right',
+                                            itemOpacity: 1,
+                                            symbolSize: 18,
+                                            symbolShape: 'circle',
+                                            effects: [
+                                                {
+                                                    on: 'hover',
+                                                    style: {
+                                                        itemTextColor: '#000'
+                                                    }
+                                                }
+                                            ],
+                                            textStyle: {
+                                                fontSize: '32px',
+                                                fontWeight: 'bold'
+                                            }
+                                        }
+                                    ]}
+                                    colors={({ data }) => data.color}
+                                />
                         }
                     </div>
                     <div className='flex flex-col items-center py-4 h-80 w-full md:w-1/2'>
                         {/* <h2 className='font-semibold uppercase text-2xl'>Cantidad</h2> */}
                         {
-                            data2.length === 0 ? <motion.p
-                                className={`uppercase m-auto`}
+                            loading ? (<svg class="animate-spin h-10 w-10 m-auto" viewBox="0 0 24 24"><circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                                fill="none"
+                            ></circle>
+                                <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M12 2a10 10 0 00-10 10h4a6 6 0 016-6V2z"
+                                ></path></svg>) :
+                                data2.length === 0 ? <motion.p
+                                    className={`uppercase m-auto`}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.5 }}
+                                >
+                                    No hay datos para mostrar
+                                </motion.p> : <ResponsiveBar
+                                    data={data2}
+                                    keys={[
+                                        'Aprobados',
+                                        'Desaprobados',
+                                        'Ausentes'
+                                    ]}
+                                    indexBy="aula"
+                                    margin={{ top: 50, right: 25, bottom: 50, left: 60 }}
+                                    padding={0.3}
+                                    valueScale={{ type: 'linear' }}
+                                    indexScale={{ type: 'band', round: true }}
+                                    colors={({ id, data }) => data[`${id}Color`]}
+                                    borderColor={{
+                                        from: 'color',
+                                        modifiers: [
+                                            [
+                                                'darker',
+                                                1.6
+                                            ]
+                                        ]
+                                    }}
+                                    axisTop={null}
+                                    axisRight={null}
+                                    axisBottom={{
+                                        tickSize: 5,
+                                        tickPadding: 5,
+                                        tickRotation: 0,
+                                        legend: 'Aula',
+                                        legendPosition: 'middle',
+                                        legendOffset: 32,
+                                        truncateTickAt: 0
+                                    }}
+                                    axisLeft={{
+                                        tickSize: 5,
+                                        tickPadding: 5,
+                                        tickRotation: 0,
+                                        legend: 'Cantidad',
+                                        legendPosition: 'middle',
+                                        legendOffset: -40,
+                                        truncateTickAt: 0,
+                                    }}
+                                    labelSkipWidth={16}
+                                    labelSkipHeight={16}
+                                    labelTextColor="#fff"
+                                    itemTextColor="#000"
+                                    legends={[
+                                        {
+                                            dataFrom: 'keys',
+                                            anchor: 'top',
+                                            direction: 'row',
+                                            justify: false,
+                                            translateX: 0,
+                                            translateY: -35,
+                                            itemsSpacing: 2,
+                                            itemWidth: 100,
+                                            itemHeight: 20,
+                                            itemTextColor: '#000',
+                                            itemDirection: 'left-to-right',
+                                            itemOpacity: 1,
+                                            symbolSize: 20,
+                                            symbolShape: 'circle',
+                                            effects: [
+                                                {
+                                                    on: 'hover',
+                                                    style: {
+                                                        itemOpacity: 1
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    ]}
+                                    role="application"
+                                    barAriaLabel={e => e.id + ": " + e.formattedValue + " in country: " + e.indexValue}
+                                    theme={{
+                                        labels: {
+                                            text: {
+                                                fontSize: 12,
+                                                fontWeight: 'bold',
+                                            }
+                                        }
+                                    }}
+                                />
+                        }
+                    </div>
+                </div>
+            </div>
+            <div className='flex flex-col md:flex-row w-full items-center pb-4 px-2 h-auto md:2/6'>
+                <div className='flex flex-col items-center md:h-80 w-full md:w-1/2 h-96'>
+                    {
+                        loading ? (<svg class="animate-spin h-10 w-10 mt-24" viewBox="0 0 24 24"><circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                            fill="none"
+                        ></circle>
+                            <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M12 2a10 10 0 00-10 10h4a6 6 0 016-6V2z"
+                            ></path></svg>) :
+                            data3.length === 0 ? <motion.p
+                                className={`uppercase mt-24`}
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ duration: 0.5 }}
                             >
                                 No hay datos para mostrar
                             </motion.p> : <ResponsiveBar
-                                data={data2}
+                                data={data3}
                                 keys={[
-                                    'Aprobados',
-                                    'Desaprobados',
-                                    'Ausentes'
+                                    'Respuesta'
                                 ]}
-                                indexBy="aula"
-                                margin={{ top: 50, right: 25, bottom: 50, left: 60 }}
-                                padding={0.3}
+                                indexBy="cantRespuestas"
+                                margin={{ top: 10, right: 25, bottom: 120, left: 60 }}
+                                padding={0.1}
                                 valueScale={{ type: 'linear' }}
                                 indexScale={{ type: 'band', round: true }}
                                 colors={({ id, data }) => data[`${id}Color`]}
@@ -746,7 +887,7 @@ const Estadisticas = (props) => {
                                     tickSize: 5,
                                     tickPadding: 5,
                                     tickRotation: 0,
-                                    legend: 'Aula',
+                                    legend: 'Respuestas correctas',
                                     legendPosition: 'middle',
                                     legendOffset: 32,
                                     truncateTickAt: 0
@@ -755,11 +896,12 @@ const Estadisticas = (props) => {
                                     tickSize: 5,
                                     tickPadding: 5,
                                     tickRotation: 0,
-                                    legend: 'Cantidad',
+                                    legend: 'Cantidad de personas',
                                     legendPosition: 'middle',
                                     legendOffset: -40,
                                     truncateTickAt: 0,
                                 }}
+                                labelPosition="end"
                                 labelSkipWidth={16}
                                 labelSkipHeight={16}
                                 labelTextColor="#fff"
@@ -801,109 +943,28 @@ const Estadisticas = (props) => {
                                     }
                                 }}
                             />
-                        }
-                    </div>
-                </div>
-            </div>
-            <div className='flex flex-col md:flex-row w-full items-center pb-4 px-2 h-auto md:2/6'>
-                <div className='flex flex-col items-center md:h-80 w-full md:w-1/2 h-96'>
-                    {
-                        data3.length === 0 ? <motion.p
-                            className={`uppercase m-auto`}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.5 }}
-                        >
-                            No hay datos para mostrar
-                        </motion.p> : <ResponsiveBar
-                            data={data3}
-                            keys={[
-                                'Respuesta'
-                            ]}
-                            indexBy="cantRespuestas"
-                            margin={{ top: 10, right: 25, bottom: 120, left: 60 }}
-                            padding={0.1}
-                            valueScale={{ type: 'linear' }}
-                            indexScale={{ type: 'band', round: true }}
-                            colors={({ id, data }) => data[`${id}Color`]}
-                            borderColor={{
-                                from: 'color',
-                                modifiers: [
-                                    [
-                                        'darker',
-                                        1.6
-                                    ]
-                                ]
-                            }}
-                            axisTop={null}
-                            axisRight={null}
-                            axisBottom={{
-                                tickSize: 5,
-                                tickPadding: 5,
-                                tickRotation: 0,
-                                legend: 'Respuestas correctas',
-                                legendPosition: 'middle',
-                                legendOffset: 32,
-                                truncateTickAt: 0
-                            }}
-                            axisLeft={{
-                                tickSize: 5,
-                                tickPadding: 5,
-                                tickRotation: 0,
-                                legend: 'Cantidad de personas',
-                                legendPosition: 'middle',
-                                legendOffset: -40,
-                                truncateTickAt: 0,
-                            }}
-                            labelPosition="end"
-                            labelSkipWidth={16}
-                            labelSkipHeight={16}
-                            labelTextColor="#fff"
-                            itemTextColor="#000"
-                            legends={[
-                                {
-                                    dataFrom: 'keys',
-                                    anchor: 'top',
-                                    direction: 'row',
-                                    justify: false,
-                                    translateX: 0,
-                                    translateY: -35,
-                                    itemsSpacing: 2,
-                                    itemWidth: 100,
-                                    itemHeight: 20,
-                                    itemTextColor: '#000',
-                                    itemDirection: 'left-to-right',
-                                    itemOpacity: 1,
-                                    symbolSize: 20,
-                                    symbolShape: 'circle',
-                                    effects: [
-                                        {
-                                            on: 'hover',
-                                            style: {
-                                                itemOpacity: 1
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]}
-                            role="application"
-                            barAriaLabel={e => e.id + ": " + e.formattedValue + " in country: " + e.indexValue}
-                            theme={{
-                                labels: {
-                                    text: {
-                                        fontSize: 12,
-                                        fontWeight: 'bold',
-                                    }
-                                }
-                            }}
-                        />
                     }
                 </div>
                 <div className='flex flex-col w-full justify-center items-center md:w-1/2 px-8 md:flex-row'>
                     <div className='flex flex-col items-center justify-center w-full md:w-1/2 md:h-80 h-96'>
                         {
-                            data4.length === 0 ? <motion.p
-                                className={`uppercase m-auto`}
+                            loading ? (<svg class="animate-spin h-10 w-10 mb-24" viewBox="0 0 24 24">
+                                <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                    fill="none"
+                                ></circle>
+                                <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M12 2a10 10 0 00-10 10h4a6 6 0 016-6V2z"
+                                ></path>
+                            </svg>) : (data4.length === 0 ? <motion.p
+                                className={`uppercase mb-24`}
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ duration: 0.5 }}
@@ -991,10 +1052,10 @@ const Estadisticas = (props) => {
                                         }
                                     }
                                 }}
-                            />
+                            />)
                         }
                     </div>
-                    <div className='flex flex-col justify-center items-center w-full md:w-1/2 md:h-80 h-96'>
+                    <div className='flex flex-col justify-center items-center w-full md:w-1/2 md:h-80'>
                         <div className='flex flex-col w-full items-center bg-[#73be62] mb-4 rounded-lg py-2'>
                             <motion.p
                                 className={`uppercase text-white text-5xl font-bold`}

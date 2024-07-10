@@ -1,13 +1,13 @@
-import React from 'react'
+import { useContext } from 'react'
 import Aside from '../components/Aside'
 import Estadisticas from '../components/Estadisticas'
 import Carga from '../components/Carga'
 import { useLocation } from 'react-router-dom'
+import { ContextConfig } from '../context/ContextConfig'
 
 const Home = () => {
 
     const location = useLocation();
-    const page = location.state?.page || '';
     const path = location.pathname.includes('carga') ? 'carga' : 'estadisticas';
 
     return (
@@ -15,13 +15,13 @@ const Home = () => {
             {
                 path === "carga" ? (
                     <>
-                        <Aside pagina={page} />
+                        <Aside />
                         <Carga />
                     </>
                 ) : (
                     <>
-                        <Aside pagina={page} />
-                        <Estadisticas pagina={page}/>
+                        <Aside />
+                        <Estadisticas />
                     </>
                 )
             }

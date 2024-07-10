@@ -1,13 +1,16 @@
-import { useState } from 'react'
+import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Home from '../pages/Home'
+import { ContextConfig } from '../context/ContextConfig'
 
 const Inicio = () => {
+
+    const { handlePageName } = useContext(ContextConfig);
 
     const navigate = useNavigate();
 
     const handleClick = (page) => {
-        navigate('/examenes/resultados', { state: { page } });
+        handlePageName(page)
+        navigate('/examenes/resultados');
     }
 
     return (
@@ -23,9 +26,9 @@ const Inicio = () => {
                     EXAMEN SERVICIO PENITENCIARIO
                 </button>
             </div>
-            <div className='h-1/5 w-full flex flex-row gap-32 items-center justify-center pb-4'>
+            <div className='h-1/5 w-full flex flex-row gap-16 md:gap-32 items-center justify-center pb-4'>
                 <img src="/examenes/logo_policia.png" className="w-auto h-full"/>
-                <img src="/examenes/LOGO_SPT_TUCUMAN.png" className="w-auto h-full"/>
+                <img src="/examenes/logo_penitenciario.png" className="w-auto h-full"/>
             </div>
         </div>
     )
